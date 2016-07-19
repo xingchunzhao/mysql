@@ -1,0 +1,184 @@
+(1)mysql入门语句
+1.先建立数据服务器
+2.建立数据库
+3.建立表，声明列
+mysql连接：
+mysql -h loalhost -u root -p
+mysql -uroot -p
+查看数据库：show databases;
+创建数据库：create database python
+选择数据库：use python
+删除数据库：drop database test;
+查看表：show tables;
+创建表：
+create table class(
+id int,
+name varchar(10),
+age int
+);
+表重命名：rename table class to newclass;
+删除表：drop table newclass;
+查看表结构：desc stu;
+练习：
+制作留言表：
+create table msg(
+id int,
+title varchar(60),
+name varchar(10),
+content varchar(1000)
+);
+不能修改数据库的名字！！！！！！！！！！
+
+！！！！解决字符集问题！！！！
+默认建表一般用utf-8
+set names gdk;
+
+(2)insert, delete, update, select操作
+插入表：
+insert into msg
+(id ,title, name, content)
+values
+(1,'初来咋到', '张三', '我是老大！！！');
+
+insert into msg
+(id ,title, name, content)
+values
+(3,'3标题', '刘备', '我又来了~~~'),
+(4,'4标题', '关羽', '我又来了~~~'),
+(5,'5标题', '张飞', '我又来了~~~');
+
+更新表：
+update msg 
+set id = 2,
+content = '我才是最帅的'
+where
+name = '李四';
+update msg 
+set id = 2
+where
+name = '李四';
+
+删除表数据：
+delete from msg
+where id = 5;
+
+查询表格
+查询表全部内容：
+select * from msg;
+指定查询部分列
+select id, title from msg;
+指定查询部分行：
+select name, content from msg 
+where id > 2;
+
+增加列：
+alter table msg add age tinyint(1);
+alter table msg add age tinyint not null default 0;
+
+(3)数据类型
+1.所谓建表，就是声明列的过程
+2.选列的原则是够用就好
+3.列的类型：数值型，字符型，时期/时间型
+4.整型：Tinyint(1个字节：0~255),
+Smallint(2个字节：0~65535),Mediumint(2个字节：0~2),
+Int(4个字节：32位),bigint()
+默认是有符号的。
+整型列的可选属性
+tinyint(M), unsigned, zerofill
+tinyint(M):
+M：宽度（在0填充的时候才有意义），不影响数据
+unsigned:无符号类型（非负）
+zerofill:0填充（默认无符号 unsigned ）
+列的默认值：！！！！！！
+Not null default 0
+
+(4)字符型:char, varchar, test(文本串)
+char:定长， char(M),M代表可容纳的字符数，不是字节数
+varchar:变长, varchar(M),M代表可容纳的字符数，不是字节数
+区别：
+定长：M个字符，如果存在小于M个字符，实占M个字符，实占空间M，利用率<=100% 0<= M <=255
+如果不够M个字符，内部用空格补齐，取出的时候会丢失空格。
+变长：只有N<M个字符，实占N个字符, 占用空间N+(1~2)，利用率 N/(N+(1~2)) < 100%, 0 <= M <=65535
+速度上，定长快些。
+char,varchar选择原则
+1.空间利用效益：个人简历，微博，选择的是varchar
+2.速度：用户名：char
+
+(5)时间/日期类型
+create table y(
+ya year(4)
+);
+
+年类型 -->year 
+1个字节 表示 1901-2155,[0000],表示错误时的选择
+如果输入2位，'00~69'表示2000~2069，'70~99'表示1970~1999
+#日期类型：date
+典型格式 1992-08-12
+日期类型：'1000-01-01'
+create table d(
+title varchar(10)
+dt date
+)charset utf8;
+时间类型：tiem
+典型格式：hh:mm:ss
+时间类型：'-838:59:59' ~'+838:59:59'
+create table t(
+tm date
+)charset utf8;
+
+日期时间类型：datetime类型：
+典型格式：1989-05-06 14:15:255
+日期时间类型：1001-01-01 00:00:00 ~ 9999-12-31 23:59:59
+
+注意：在开发中，很少用日期事件类型来表示一个需要精确到秒的列。
+原因：虽然日期时间类型能精确到秒，而且方便查看，但计算不方便
+使用时间戳表示。
+时间戳：
+是1970-01-01 00:00:00 到当前的秒数
+一般存注册时间，商品发布会时间等，并不是用datetime存储，而是时间戳 
+用int型存储时间戳，方便计算，对于显示来说，也可以方便格式化
+面试问题：
+
+（6）增删改详细解读：
+insert into tableName ('列名') values ('内容')；
+delete from tableName where id = 5;
+update tableName set 列名 = 新值 where id = 5;
+(7)查
+select * from tableName while id > 3;
+
+（8）查询的5种语句
+where 详解
+>, <, =, !=, <>, >=, <=, in(值1，值2，...，值N) 等于1~N任意一个，都行, 
+betwwen 值1 and 值2，表示在值1，值2之间(包括值1，值2),
+not 不属于
+not in 不在里面
+OR (||)
+and (&&)
+模糊查询：
+like 像
+% 通配任意字符
+'_' 通配单一字符
+
+group 详解:max,min,sum,avg, count,
+常用于统计的场合
+语法：group by clo1,clo2,...,cloN
+查询每个栏目最贵的商品价格
+select cat_id, max(shop_price) from goods group by cat_id;
+查询所有栏目积压的货款
+select cat_id sum(shop_price*goods_nnumber) from goods group by cat_id;
+
+having 详解:对结果的进一步筛选
+#查询出本店价格比市场价格低多少钱，并且把低于200元以上的商品选择出来
+select goods_id, goods_name, cat_id, market_price - goods_price as shen from goods where cat_id = 3 having shen >= 200;
+#查询积压货款超过2W的栏目，以及该栏目积压的获取
+elect cat_id sum(shop_price*goods_nnumber) as hk from goods group by cat_id having hk > 20000;
+#查询两门或者两门以上不及格的同学的平均分
+#要求只见一次select语句
+select name, avg(score), sum(score < 60) as gk  from std group by name having gk >= 2;
+
+
+
+
+
+
+
